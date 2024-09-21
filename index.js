@@ -20,7 +20,7 @@ client.once("ready", () => {
 // kick user
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!kick")) {
-    if (!message.member.permissions.has("KICK_MEMBERS")) {
+    if (!message.member.permissions.has("KickMembers")) {
       return message.reply("You do not have permission to kick members.");
     }
 
@@ -43,7 +43,7 @@ client.on("messageCreate", async (message) => {
 
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!ban")) {
-    if (!message.member.permissions.has("BAN_MEMBERS")) {
+    if (!message.member.permissions.has("BanMembers")) {
       return message.reply("You don't have any permission to ban members.");
     }
   }
@@ -65,7 +65,7 @@ client.on("messageCreate", async (message) => {
 // unban specific member
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!unban")) {
-    if (!message.member.permissions.has("BAN_MEMBERS")) {
+    if (!message.member.permissions.has("BanMembers")) {
       return message.reply("You don't have any permission to unban members.");
     }
   }
@@ -74,7 +74,7 @@ client.on("messageCreate", async (message) => {
 // assign a role to a member
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!role")) {
-    if (!message.member.permissions.has("MANAGE_ROLES")) {
+    if (!message.member.permissions.has("ManageRoles")) {
       return message.reply("You don't have any permission to assign roles.");
     }
 
@@ -96,7 +96,7 @@ client.on("messageCreate", async (message) => {
 // admin create channel
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!create-channel")) {
-    if (!message.member.permissions.has("MANAGE_CHANNELS")) {
+    if (!message.member.permissions.has("ManageChannels")) {
       return message.reply(
         "You don't have the permission to create a channel.",
       );
@@ -117,7 +117,7 @@ client.on("messageCreate", async (message) => {
 // lock channel
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!lock")) {
-    if (!message.member.permissions.has("MANAGE_CHANNELS")) {
+    if (!message.member.permissions.has("ManageChannels")) {
       return message.reply("You don't have any permissions to lock channels.");
     }
 
@@ -132,14 +132,77 @@ client.on("messageCreate", async (message) => {
 // unlock channel
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!unlock")) {
-    if (!message.member.permissions.has("MANAGE_CHANNELS")) {
+    if (!message.member.permissions.has("ManageChannels")) {
       return message.reply("You don't any permissions to unlock channels.");
     }
 
-    await message.channel.permissionOverwrites.edit(
-      message.guild.roles.everyone,
-      { SEND_MESSAGES: true },
+    try {
+      await message.channel.permissionOverwrites.edit(
+        message.guild.roles.everyone,
+        { SEND_MESSAGES: true },
+      );
+      message.channel.send("Channel has been unlocked.");
+    } catch (error) {
+      console.error(error);
+      return message.reply("Unable to unlock a channel.");
+    }
+  }
+});
+
+// set nickname
+client.on("messageCreate", async (message) => {
+  if (message.content.startsWith("!setnick")) {
+    if (!message.member.permissions.has("ManageNicknames")) {
+      return message.reply("You don't have any permissions to set nicknames.");
+    }
+  }
+  try {
+    const member = message.mentions.members.first();
+    const newNickname = message.content.split(" ").slice(2).join(" ");
+
+    if (!member || !newNickname) {
+      return message.reply(
+        "Please mention a valid name and provide a new nickname.",
+      );
+    }
+
+    await member.setNickname(newNickname);
+    message.channel.send(
+      `Nickname for ${member.user.tag} has been changed to ${newNickname}`,
     );
-    message.channel.send("Channel has been unlocked.");
+  } catch (error) {
+    message.reply(
+      "I was unable to set the nickname. Maybe the user has a higher role.",
+    );
+    console.log(error);
+  }
+});
+
+// remove nickname
+client.on("messageCreate", async (message) => {
+  if (message.content.startsWith("!rmnick")) {
+    if (!message.member.permissions.has("ManageNicknames")) {
+      return message.reply(
+        "You don't have any permissions to remove nicknames.",
+      );
+    }
+
+    const member = message.mentions.members.first();
+
+    if (!member) {
+      return message.reply(
+        "Please enter a valid member to remove their nickname.",
+      );
+    }
+
+    try {
+      await member.setNickname("");
+      message.channel.send(`Nickname for ${member.user.tag} has been removed.`);
+    } catch (error) {
+      message.reply(
+        "I was unable to remove the nickname. Maybe the user has a higher role?",
+      );
+      console.error(error);
+    }
   }
 });
