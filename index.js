@@ -101,5 +101,45 @@ client.on("messageCreate", async (message) => {
         "You don't have the permission to create a channel.",
       );
     }
+
+    const channelName = message.content.split(" ");
+    if (!channelName) {
+      return message.reply("Please provide a channel name.");
+    } else if (channelName) {
+      return message.reply("Channel already exists.");
+    }
+
+    await message.guild.channels.create(channelName, { type: "GUILD_TEXT" });
+    message.channel.send(`Channel ${channelName} has been created.`);
+  }
+});
+
+// lock channel
+client.on("messageCreate", async (message) => {
+  if (message.content.startsWith("!lock")) {
+    if (!message.member.permissions.has("MANAGE_CHANNELS")) {
+      return message.reply("You don't have any permissions to lock channels.");
+    }
+
+    await message.channel.permissionOverwrites.edit(
+      message.guild.roles.everyone,
+      { SEND_MESSAGES: false },
+    );
+    message.channel.send("Channel has been locked.");
+  }
+});
+
+// unlock channel
+client.on("messageCreate", async (message) => {
+  if (message.content.startsWith("!unlock")) {
+    if (!message.member.permissions.has("MANAGE_CHANNELS")) {
+      return message.reply("You don't any permissions to unlock channels.");
+    }
+
+    await message.channel.permissionOverwrites.edit(
+      message.guild.roles.everyone,
+      { SEND_MESSAGES: true },
+    );
+    message.channel.send("Channel has been unlocked.");
   }
 });
