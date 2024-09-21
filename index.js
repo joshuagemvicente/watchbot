@@ -156,16 +156,16 @@ client.on("messageCreate", async (message) => {
       return message.reply("You don't have any permissions to set nicknames.");
     }
   }
+
+  const member = message.mentions.members.first();
+  const newNickname = message.content.split(" ").slice(2).join(" ");
+
+  if (!member || !newNickname) {
+    return message.reply(
+      "Please mention a valid name and provide a new nickname.",
+    );
+  }
   try {
-    const member = message.mentions.members.first();
-    const newNickname = message.content.split(" ").slice(2).join(" ");
-
-    if (!member || !newNickname) {
-      return message.reply(
-        "Please mention a valid name and provide a new nickname.",
-      );
-    }
-
     await member.setNickname(newNickname);
     message.channel.send(
       `Nickname for ${member.user.tag} has been changed to ${newNickname}`,
