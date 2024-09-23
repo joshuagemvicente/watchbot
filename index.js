@@ -40,7 +40,6 @@ client.on("messageCreate", async (message) => {
 });
 
 // ban specific member
-
 client.on("messageCreate", async (message) => {
   if (message.content.startsWith("!ban")) {
     if (!message.member.permissions.has("BanMembers")) {
@@ -101,7 +100,6 @@ client.on("messageCreate", async (message) => {
         "You don't have the permission to create a channel.",
       );
     }
-
     const channelName = message.content.split(" ");
     if (!channelName) {
       return message.reply("Please provide a channel name.");
