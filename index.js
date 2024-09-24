@@ -119,11 +119,15 @@ client.on("messageCreate", async (message) => {
       return message.reply("You don't have any permissions to lock channels.");
     }
 
-    await message.channel.permissionOverwrites.edit(
-      message.guild.roles.everyone,
-      { SEND_MESSAGES: false },
-    );
-    message.channel.send("Channel has been locked.");
+    try {
+      await message.channel.permissionOverwrites.edit(
+        message.guild.roles.everyone,
+        { SEND_MESSAGES: false },
+      );
+      message.channel.send("Channel has been locked.");
+    } catch (error) {
+      console.error(error);
+    }
   }
 });
 
